@@ -38,7 +38,7 @@
   (let [char (char-at board tile)
         word (str word char)
         visited (conj visited tile)]
-    (when-let [sub-trie (t/get-children trie char)]
+    (when-let [sub-trie (t/children trie char)]
       (->> (neighbours board tile)
            (unvisited visited)
            (mapcat (partial words board sub-trie visited word))
@@ -54,5 +54,5 @@
 
 ;; (count (clojure.string/split-lines (slurp "/usr/share/dict/words")))
 
-;; (time (do (trie (clojure.string/split-lines (slurp "/usr/share/dict/words")))
-;;             nil))
+;; (def real-dict-trie
+;;   (t/build (clojure.string/split-lines (slurp "/usr/share/dict/words"))))

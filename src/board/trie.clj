@@ -1,13 +1,13 @@
 (ns board.trie)
 
-(defn update
+(defn update-trie
   [trie word]
   (when-let [[hd & tl] (seq word)]
     (assoc-in
      trie [:children hd]
      (let [sub-trie (get-in trie [:children hd])]
        (if (seq tl)
-         (update sub-trie tl)
+         (update-trie sub-trie tl)
          (assoc sub-trie :terminal? true))))))
 
 (defn lookup
@@ -20,13 +20,13 @@
           (:terminal? sub-trie))))))
 
 
-(defn get-children
+(defn children
   [trie char]
   (get-in trie [:children char]))
 
 (defn build
   [dictionary]
-  (reduce update nil dictionary))
+  (reduce update-trie nil dictionary))
 
 (defn term?
   [trie]
