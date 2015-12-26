@@ -35,14 +35,14 @@
 
 (defn words
   [board trie visited word tile]
-  (let [char (char-at board tile)]
+  (let [char (char-at board tile)
+        word (str word char)
+        visited (conj visited tile)]
     (when-let [sub-trie (t/get trie char)]
-      (let [visited (conj visited tile)
-            word (str word char)]
-        (->> (neighbours board tile)
-             (unvisited visited)
-             (mapcat (partial words board sub-trie visited word))
-             (concat (if (t/term? sub-trie) [word] [])))))))
+      (->> (neighbours board tile)
+           (unvisited visited)
+           (mapcat (partial words board sub-trie visited word))
+           (concat (if (t/term? sub-trie) [word] []))))))
 
 (defn all-words
   "Find all words on the board that are in the dictionary"
