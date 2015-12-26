@@ -58,21 +58,17 @@
   (let [[x y] tile]
     (nth (nth board y) x)))
 
-(defn words-here
-  [trie word]
-  (flatten (when (:terminal? trie)
-             (list word))))
-
 (defn words
   [board trie visited word tile]
   (when-let [sub-trie (sub-trie trie (char-at board tile))]
     (let [visited (conj visited tile)
           char (char-at board tile)
-          word (str word char)]
+          word (str word char)
+          word-here? (:terminal? sub-trie)]
       (->> (neighbours board tile)
            (unvisited visited)
            (mapcat (partial words board sub-trie visited word))
-           (concat (words-here sub-trie word))))))
+           (concat (if word-here? [word] []))))))
 
 (defn all-words
   [board trie]
