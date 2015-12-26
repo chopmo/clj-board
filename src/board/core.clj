@@ -52,7 +52,11 @@
          tiles
          (mapcat (partial words board trie #{} "")))))
 
-;; (count (clojure.string/split-lines (slurp "/usr/share/dict/words")))
 
-;; (def real-dict-trie
-;;   (t/build (clojure.string/split-lines (slurp "/usr/share/dict/words"))))
+;; (def real-dict
+;;   (clojure.string/split-lines (slurp "/usr/share/dict/words")))
+
+;; (def demo-board
+;;   [[\h \e \x \m]
+;;    [\w \t \l \a]
+;;    [\q \l \o \s]])
