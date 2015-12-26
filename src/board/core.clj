@@ -1,10 +1,32 @@
 (ns board.core
-  (:require [board.trie :as t]
-            [clojure.pprint :refer [pprint]]
+  (:require [clojure.pprint :refer [pprint]]
             [clojure.test :refer :all]
             [clojure.set :as s]))
 
+;; Tries
+(defn update-trie
+  [trie word]
+  (when-let [[hd & tl] (seq word)]
+    (assoc-in
+     trie [:children hd]
+     (let [sub-trie (get-in trie [:children hd])]
+       (if (seq tl)
+         (update-trie sub-trie tl)
+         (assoc sub-trie :terminal? true))))))
 
+(defn build-trie
+  [dictionary]
+  (reduce update-trie nil dictionary))
+
+(defn children
+  [trie char]
+  (get-in trie [:children char]))
+
+(defn term?
+  [trie]
+  (:terminal? trie))
+
+;; Board structure
 (defn neighbours
   [board tile]
   (let [[x y] tile]
@@ -33,21 +55,22 @@
   (let [[x y] tile]
     (nth (nth board y) x)))
 
+;; Solver
 (defn words
   [board trie visited word tile]
   (let [char (char-at board tile)
         word (str word char)
         visited (conj visited tile)]
-    (when-let [sub-trie (t/children trie char)]
+    (when-let [sub-trie (children trie char)]
       (->> (neighbours board tile)
            (unvisited visited)
            (mapcat (partial words board sub-trie visited word))
-           (concat (if (t/term? sub-trie) [word] []))))))
+           (concat (if (term? sub-trie) [word] []))))))
 
 (defn all-words
   "Find all words on the board that are in the dictionary"
   [board dict]
-  (let [trie (t/build dict)]
+  (let [trie (build-trie dict)]
     (->> board
          tiles
          (mapcat (partial words board trie #{} "")))))
