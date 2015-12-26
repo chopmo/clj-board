@@ -78,7 +78,9 @@
 
 (defn all-words
   [board trie]
-  (mapcat (partial words board trie []) (tiles board)))
+  (->> board
+       tiles
+       (mapcat (partial words board trie []))))
 
 (deftest board-test
   (testing "Finding words"
