@@ -1,20 +1,7 @@
 (ns board.core
-  (:require [clojure.pprint]
+  (:require [clojure.pprint :refer [pprint]]
             [clojure.test :refer :all]
-            [clojure.set :as s]])
-
-;; (def dictionary
-;;   ["hello"
-;;    "world"
-;;    "xmas"
-;;    "wello"])
-
-;; (def board
-;;   [[\h \e \x \m]
-;;    [\w \t \l \a]
-;;    [\q \l \o \s]])
-
-;; hello, xmas, wello
+            [clojure.set :as s]))
 
 (defn update-trie
   [trie word]
@@ -30,11 +17,6 @@
   [dictionary]
   (reduce update-trie nil dictionary))
 
-#_(count (clojure.string/split-lines (slurp "/usr/share/dict/words")))
-
-#_(time (do (trie (clojure.string/split-lines (slurp "/usr/share/dict/words")))
-          nil))
-
 (defn lookup
   [trie word]
   (when trie
@@ -43,11 +25,6 @@
         (if tl
           (lookup sub-trie tl)
           (:terminal? sub-trie))))))
-
-
-(lookup
- (trie ["hello" "world"])
- "world")
 
 (defn neighbours
   [board x y]
@@ -62,8 +39,8 @@
 (defn unvisited
   [tiles visited]
   (let [st (set tiles)
-        sv (set visited)
-        (s/difference st sv)]))
+        sv (set visited)]
+    (s/difference st sv)))
 
 (defn tiles
   [board]
@@ -77,17 +54,7 @@
 
 (defn words-at
   [board x y]
-  (let [c (char-at board x y)]
-    ))
-
-(defn build-words
-  [board x y visited chars trie]
-  (let [c (char-at board x y)
-        sub-trie (get-in trie [:children c])]
-    (when sub-trie
-      (if (:terminal? sub-trie)
-        (println c)
-        ))))
+  (let [c (char-at board x y)]))
 
 (defn word-here
   [board trie path]
@@ -95,41 +62,46 @@
     (let [chars (map #(char-at board (first %) (last %)) path)]
       (apply str chars))))
 
-(def dictionary
-  ["a"])
-
-(def board
-  [[\a \b]
-   [\c \d]])
-
-(def dic-trie
-  (trie dictionary))
-
-
 (defn words
   [board trie path tile]
   (let [[x y] tile
         c (char-at board x y)
         sub-trie (get-in trie [:children c])
-        path (conj path [x y])]
+        path (conj path tile)]
     (when sub-trie
       (let [w (word-here board sub-trie path)
-            unvisited-neighbors (...)]
-        (conj
+            ws (if w [w] [])
+            unvisited-neighbors (unvisited (neighbours board x y) path)]
+        (concat
          (mapcat (partial words board sub-trie path) unvisited-neighbors)
-         w)))))
+         ws)))))
 
 (defn all-words
   [board trie]
-  (compact (map (partial words board trie []) (tiles board))))
+  (mapcat (partial words board trie []) (tiles board)))
 
 (deftest board-test
   (testing "Finding words"
     (let [dict-trie (trie ["i" "bi" "bib"])
-          board [[\b \i]]
-          ]
+          board [[\b \i]]]
       (is (=
-           (all-words board dict-trie)
-           '("i" "bi"))))))
+           (set (all-words board dict-trie))
+           (set ["bi" "i"])))))
+  (testing "Finding more words"
+    (let [dict ["hello"
+                "world"
+                "xmas"
+                "wello"]
+          board [[\h \e \x \m]
+                 [\w \t \l \a]
+                 [\q \l \o \s]]
+          words ["hello" "xmas" "wello"]]
+      (is (= (set words)
+             (set (all-words board (trie dict))))))))
 
 (board-test)
+
+;; (count (clojure.string/split-lines (slurp "/usr/share/dict/words")))
+
+;; (time (do (trie (clojure.string/split-lines (slurp "/usr/share/dict/words")))
+;;             nil))
