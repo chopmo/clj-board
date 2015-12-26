@@ -78,7 +78,7 @@
   [board trie]
   (->> board
        tiles
-       (mapcat (partial words board trie [] ""))))
+       (mapcat (partial words board trie #{} ""))))
 
 (deftest board-test
   (testing "Finding a minimal set of words"
