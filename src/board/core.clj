@@ -68,13 +68,12 @@
   (when-let [sub-trie (sub-trie trie (char-at board tile))]
     (let [path (conj path tile)
           char (char-at board tile)
-          word (str word char)
-          neighbor-words (->> (neighbours board tile)
-                              (unvisited path)
-                              (mapcat (partial words board sub-trie path word)))]
+          word (str word char)]
       (concat
        (words-here sub-trie word)
-       neighbor-words))))
+       (->> (neighbours board tile)
+            (unvisited path)
+            (mapcat (partial words board sub-trie path word)))))))
 
 (defn all-words
   [board trie]
