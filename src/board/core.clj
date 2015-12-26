@@ -59,28 +59,28 @@
     (nth (nth board y) x)))
 
 (defn words-here
-  [board trie path]
-  (if (:terminal? trie)
-    (let [chars (map #(char-at board %) path)]
-      (list (apply str chars)))))
+  [trie word]
+  (flatten (when (:terminal? trie)
+             (list word))))
 
 (defn words
-  [board trie path tile]
+  [board trie path word tile]
   (when-let [sub-trie (sub-trie trie (char-at board tile))]
     (let [path (conj path tile)
-          unvisited-neighbors (unvisited path (neighbours board tile))
-          neighbor-words (mapcat
-                          (partial words board sub-trie path)
-                          unvisited-neighbors)]
+          char (char-at board tile)
+          word (str word char)
+          neighbor-words (->> (neighbours board tile)
+                              (unvisited path)
+                              (mapcat (partial words board sub-trie path word)))]
       (concat
-       (flatten (words-here board sub-trie path))
+       (words-here sub-trie word)
        neighbor-words))))
 
 (defn all-words
   [board trie]
   (->> board
        tiles
-       (mapcat (partial words board trie []))))
+       (mapcat (partial words board trie [] ""))))
 
 (deftest board-test
   (testing "Finding words"
