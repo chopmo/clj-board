@@ -20,7 +20,7 @@
           (:terminal? sub-trie))))))
 
 
-(defn get
+(defn get-children
   [trie char]
   (get-in trie [:children char]))
 

@@ -38,7 +38,7 @@
   (let [char (char-at board tile)
         word (str word char)
         visited (conj visited tile)]
-    (when-let [sub-trie (t/get trie char)]
+    (when-let [sub-trie (t/get-children trie char)]
       (->> (neighbours board tile)
            (unvisited visited)
            (mapcat (partial words board sub-trie visited word))
