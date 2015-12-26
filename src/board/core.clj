@@ -4,10 +4,6 @@
             [clojure.set :as s]))
 
 ;; Tries
-(defn children
-  [trie char]
-  (get-in trie [:children char]))
-
 (defn trie
   [dictionary]
   (letfn
@@ -16,7 +12,7 @@
         (assoc-in
          trie
          [:children hd]
-         (let [sub-trie (children trie hd)]
+         (let [sub-trie (get-in trie [:children hd])]
            (if (seq tl)
              (update-trie sub-trie tl)
              (assoc sub-trie :terminal? true))))))]
@@ -58,7 +54,7 @@
   (let [char (char-at board tile)
         word (str word char)
         visited (conj visited tile)]
-    (when-let [sub-trie (children trie char)]
+    (when-let [sub-trie (get-in trie [:children  char])]
       (->> (neighbours board tile)
            (unvisited visited)
            (mapcat (partial words board sub-trie visited word))
