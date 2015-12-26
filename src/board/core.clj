@@ -49,32 +49,35 @@
     [nx ny]))
 
 (defn char-at
-  [board x y]
-  (nth (nth board y) x))
-
-(defn words-at
-  [board x y]
-  (let [c (char-at board x y)]))
+  [board tile]
+  (let [[x y] tile]
+    (nth (nth board y) x)))
 
 (defn word-here
   [board trie path]
   (if (:terminal? trie)
-    (let [chars (map #(char-at board (first %) (last %)) path)]
+    (let [chars (map #(char-at board %) path)]
       (apply str chars))))
+
+(defn words-here
+  [board trie path]
+  (let [w (word-here board trie path)]
+    (if w [w] [])))
 
 (defn words
   [board trie path tile]
   (let [[x y] tile
-        c (char-at board x y)
+        c (char-at board tile)
         sub-trie (get-in trie [:children c])
         path (conj path tile)]
     (when sub-trie
-      (let [w (word-here board sub-trie path)
-            ws (if w [w] [])
-            unvisited-neighbors (unvisited (neighbours board x y) path)]
+      (let [unvisited-neighbors (unvisited (neighbours board x y) path)
+            neighbor-words (mapcat
+                            (partial words board sub-trie path)
+                            unvisited-neighbors)]
         (concat
-         (mapcat (partial words board sub-trie path) unvisited-neighbors)
-         ws)))))
+         (words-here board sub-trie path)
+         neighbor-words)))))
 
 (defn all-words
   [board trie]
