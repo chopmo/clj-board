@@ -10,15 +10,6 @@
          (update-trie sub-trie tl)
          (assoc sub-trie :terminal? true))))))
 
-(defn lookup
-  [trie word]
-  (when trie
-    (let [[hd & tl] (seq word)]
-      (let [sub-trie (get-in trie [:children hd])]
-        (if tl
-          (lookup sub-trie tl)
-          (:terminal? sub-trie))))))
-
 
 (defn children
   [trie char]
