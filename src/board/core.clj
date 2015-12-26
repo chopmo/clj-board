@@ -17,6 +17,10 @@
   [dictionary]
   (reduce update-trie nil dictionary))
 
+(defn sub-trie
+  [trie char]
+  (get-in trie [:children char]))
+
 (defn lookup
   [trie word]
   (when trie
@@ -27,14 +31,15 @@
           (:terminal? sub-trie))))))
 
 (defn neighbours
-  [board x y]
-  (for [nx (range (dec x) (+ x 2))
-        ny (range (dec y) (+ y 2))
-        :when (and
-               (<= 0 nx (dec (count (first board))))
-               (<= 0 ny (dec (count board)))
-               (not (= [x y] [nx ny])))]
-    [nx ny]))
+  [board tile]
+  (let [[x y] tile]
+    (for [nx (range (dec x) (+ x 2))
+          ny (range (dec y) (+ y 2))
+          :when (and
+                 (<= 0 nx (dec (count (first board))))
+                 (<= 0 ny (dec (count board)))
+                 (not (= [x y] [nx ny])))]
+      [nx ny])))
 
 (defn unvisited
   [tiles visited]
@@ -66,18 +71,15 @@
 
 (defn words
   [board trie path tile]
-  (let [[x y] tile
-        c (char-at board tile)
-        sub-trie (get-in trie [:children c])
-        path (conj path tile)]
-    (when sub-trie
-      (let [unvisited-neighbors (unvisited (neighbours board x y) path)
-            neighbor-words (mapcat
-                            (partial words board sub-trie path)
-                            unvisited-neighbors)]
-        (concat
-         (words-here board sub-trie path)
-         neighbor-words)))))
+  (when-let [sub-trie (sub-trie trie (char-at board tile))]
+    (let [path (conj path tile)
+          unvisited-neighbors (unvisited (neighbours board tile) path)
+          neighbor-words (mapcat
+                          (partial words board sub-trie path)
+                          unvisited-neighbors)]
+      (concat
+       (words-here board sub-trie path)
+       neighbor-words))))
 
 (defn all-words
   [board trie]
