@@ -2,6 +2,19 @@
   (:require [clojure.test :refer :all]
             [board.core :refer :all]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(deftest board-test
+  (testing "Finding a minimal set of words"
+    (let [dict-trie (trie ["i" "bi" "bib"])
+          board [[\b \i]]
+          words ["bi" "i"]]
+      (is (=
+           (set words)
+           (set (all-words board dict-trie))))))
+  (testing "Finding more words"
+    (let [dict ["hello" "world" "xmas" "wello" "heth" "xtle"]
+          board [[\h \e \x \m]
+                 [\w \t \l \a]
+                 [\q \l \o \s]]
+          words ["hello" "xmas" "wello" "xtle"]]
+      (is (= (set words)
+             (set (all-words board (trie dict))))))))
