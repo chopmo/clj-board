@@ -42,10 +42,10 @@
       [nx ny])))
 
 (defn unvisited
-  [tiles visited]
-  (let [st (set tiles)
-        sv (set visited)]
-    (s/difference st sv)))
+  [visited tiles]
+  (s/difference
+   (set tiles)
+   (set visited)))
 
 (defn tiles
   [board]
@@ -58,27 +58,22 @@
   (let [[x y] tile]
     (nth (nth board y) x)))
 
-(defn word-here
+(defn words-here
   [board trie path]
   (if (:terminal? trie)
     (let [chars (map #(char-at board %) path)]
-      (apply str chars))))
-
-(defn words-here
-  [board trie path]
-  (let [w (word-here board trie path)]
-    (if w [w] [])))
+      (list (apply str chars)))))
 
 (defn words
   [board trie path tile]
   (when-let [sub-trie (sub-trie trie (char-at board tile))]
     (let [path (conj path tile)
-          unvisited-neighbors (unvisited (neighbours board tile) path)
+          unvisited-neighbors (unvisited path (neighbours board tile))
           neighbor-words (mapcat
                           (partial words board sub-trie path)
                           unvisited-neighbors)]
       (concat
-       (words-here board sub-trie path)
+       (flatten (words-here board sub-trie path))
        neighbor-words))))
 
 (defn all-words
