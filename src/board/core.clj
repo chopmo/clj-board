@@ -4,20 +4,6 @@
             [clojure.set :as s]))
 
 ;; Tries
-(defn update-trie
-  [trie word]
-  (when-let [[hd & tl] (seq word)]
-    (assoc-in
-     trie [:children hd]
-     (let [sub-trie (get-in trie [:children hd])]
-       (if (seq tl)
-         (update-trie sub-trie tl)
-         (assoc sub-trie :terminal? true))))))
-
-(defn build-trie
-  [dictionary]
-  (reduce update-trie nil dictionary))
-
 (defn children
   [trie char]
   (get-in trie [:children char]))
@@ -25,6 +11,21 @@
 (defn term?
   [trie]
   (:terminal? trie))
+
+(defn trie
+  [dictionary]
+  (letfn
+   [(upd [trie word]
+      (when-let [[hd & tl] (seq word)]
+        (assoc-in
+         trie [:children hd]
+         (let [sub-trie (children trie hd)]
+           (if (seq tl)
+             (update-trie sub-trie tl)
+             (assoc sub-trie :terminal? true))))))]
+
+    (reduce upd nil dictionary)))
+
 
 ;; Board structure
 (defn neighbours
@@ -70,7 +71,7 @@
 (defn all-words
   "Find all words on the board that are in the dictionary"
   [board dict]
-  (let [trie (build-trie dict)]
+  (let [trie (trie dict)]
     (->> board
          tiles
          (mapcat (partial words board trie #{} "")))))
