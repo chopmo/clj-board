@@ -64,14 +64,14 @@
              (list word))))
 
 (defn words
-  [board trie path word tile]
+  [board trie visited word tile]
   (when-let [sub-trie (sub-trie trie (char-at board tile))]
-    (let [path (conj path tile)
+    (let [visited (conj visited tile)
           char (char-at board tile)
           word (str word char)]
       (->> (neighbours board tile)
-           (unvisited path)
-           (mapcat (partial words board sub-trie path word))
+           (unvisited visited)
+           (mapcat (partial words board sub-trie visited word))
            (concat (words-here sub-trie word))))))
 
 (defn all-words
