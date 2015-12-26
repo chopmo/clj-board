@@ -85,10 +85,11 @@
 (deftest board-test
   (testing "Finding words"
     (let [dict-trie (trie ["i" "bi" "bib"])
-          board [[\b \i]]]
+          board [[\b \i]]
+          words ["bi" "i"]]
       (is (=
-           (set (all-words board dict-trie))
-           (set ["bi" "i"])))))
+           (set words)
+           (set (all-words board dict-trie))))))
   (testing "Finding more words"
     (let [dict ["hello"
                 "world"
