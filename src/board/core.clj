@@ -8,23 +8,19 @@
   [trie char]
   (get-in trie [:children char]))
 
-(defn term?
-  [trie]
-  (:terminal? trie))
-
 (defn trie
   [dictionary]
   (letfn
-   [(upd [trie word]
+   [(update-trie [trie word]
       (when-let [[hd & tl] (seq word)]
         (assoc-in
-         trie [:children hd]
+         trie
+         [:children hd]
          (let [sub-trie (children trie hd)]
            (if (seq tl)
              (update-trie sub-trie tl)
              (assoc sub-trie :terminal? true))))))]
-
-    (reduce upd nil dictionary)))
+    (reduce update-trie nil dictionary)))
 
 
 ;; Board structure
@@ -66,7 +62,7 @@
       (->> (neighbours board tile)
            (unvisited visited)
            (mapcat (partial words board sub-trie visited word))
-           (concat (if (term? sub-trie) [word] []))))))
+           (concat (if (:terminal? sub-trie) [word] []))))))
 
 (defn all-words
   "Find all words on the board that are in the dictionary"
