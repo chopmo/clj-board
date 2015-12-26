@@ -4,12 +4,12 @@
 
 (deftest board-test
   (testing "Finding a minimal set of words"
-    (let [dict-trie (trie ["i" "bi" "bib"])
+    (let [dict ["i" "bi" "bib"]
           board [[\b \i]]
           words ["bi" "i"]]
       (is (=
            (set words)
-           (set (all-words board dict-trie))))))
+           (set (all-words board dict))))))
   (testing "Finding more words"
     (let [dict ["hello" "world" "xmas" "wello" "heth" "xtle"]
           board [[\h \e \x \m]
@@ -17,4 +17,4 @@
                  [\q \l \o \s]]
           words ["hello" "xmas" "wello" "xtle"]]
       (is (= (set words)
-             (set (all-words board (trie dict))))))))
+             (set (all-words board dict)))))))

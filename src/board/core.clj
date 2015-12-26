@@ -67,10 +67,12 @@
            (concat (if word-here? [word] []))))))
 
 (defn all-words
-  [board trie]
-  (->> board
-       tiles
-       (mapcat (partial words board trie #{} ""))))
+  "Find all words on the board that are in the dictionary"
+  [board dict]
+  (let [trie (trie dict)]
+    (->> board
+         tiles
+         (mapcat (partial words board trie #{} "")))))
 
 ;; (count (clojure.string/split-lines (slurp "/usr/share/dict/words")))
 
