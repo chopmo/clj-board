@@ -17,10 +17,6 @@
   [dictionary]
   (reduce update-trie nil dictionary))
 
-(defn sub-trie
-  [trie char]
-  (get-in trie [:children char]))
-
 (defn lookup
   [trie word]
   (when trie
@@ -60,7 +56,7 @@
 
 (defn words
   [board trie visited word tile]
-  (when-let [sub-trie (sub-trie trie (char-at board tile))]
+  (when-let [sub-trie (get-in trie [:children (char-at board tile)])]
     (let [visited (conj visited tile)
           char (char-at board tile)
           word (str word char)
