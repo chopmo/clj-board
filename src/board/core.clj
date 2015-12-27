@@ -11,8 +11,8 @@
       (when-let [[hd & tl] (seq word)]
         (assoc-in
          trie
-         [:children hd]
-         (let [sub-trie (get-in trie [:children hd])]
+         [hd]
+         (let [sub-trie (get-in trie [hd])]
            (if (seq tl)
              (update-trie sub-trie tl)
              (assoc sub-trie :terminal? true))))))]
@@ -54,7 +54,7 @@
   (let [char (char-at board tile)
         word (str word char)
         visited (conj visited tile)]
-    (when-let [sub-trie (get-in trie [:children  char])]
+    (when-let [sub-trie (get-in trie [char])]
       (->> (neighbours board tile)
            (unvisited visited)
            (mapcat (partial words board sub-trie visited word))
